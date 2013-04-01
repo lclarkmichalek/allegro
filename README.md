@@ -1,8 +1,8 @@
-+---------------------------------------------------------+
-|               LOCK THE GO ROUTINE YOU ARE               |
-|               DRAWING IN TO THE OS THREAD               |
-|               OR BAD THINGS WILL HAPPEN!!               |
-+---------------------------------------------------------+
+    +---------------------------------------------------------+
+    |               LOCK THE GO ROUTINE YOU ARE               |
+    |               DRAWING IN TO THE OS THREAD               |
+    |               OR BAD THINGS WILL HAPPEN!!               |
+    +---------------------------------------------------------+
 
 Bindings for the Allegro library for Go
 ---------------------------------------
@@ -13,7 +13,9 @@ Even if you think you're only using one goroutine, you're probably not; events
 are handled in a separate goroutine, as is most iteration.
 
 Documentation? Ha! Read the allegro docs. Almost everything mirrors the allegro
-C library (major exceptions are anything to do with iteration).
+C library (major exceptions are anything to do with iteration). Things have been
+"object orientified" somewhat: `al_destroy_display` -> `display.Destroy` and the
+like.
 
 If you want to do your own stuff using the C api, you can convert most of the
 types simply by casting the types (i.e. (*C.ALLEGRO_DISPLAY)(disp) and vice
@@ -51,4 +53,4 @@ Things which aren't supported and I don't know how:
  - Lack of memory leaks? AHAHAHA
  - Support for writing bitmap loaders/savers in Go
  - Being able to call stuff from more than one hardware thread
- - Emiting/catching user events
+ - Emitting/catching user events
