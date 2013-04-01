@@ -15,13 +15,7 @@ func main() {
 
 	disp := allegro.CreateDisplay(600, 400, allegro.WINDOWED)
 
-	// IMPORTANT
-	// Add 1 to GOMAXPROCS to make sure we don't stop all other goroutines
-	// running by locking this one
-	n := 1 + runtime.GOMAXPROCS(0)
-	fmt.Printf("GOMAXPROCS: %v\n", n)
-	runtime.GOMAXPROCS(n)
-	runtime.LockOSThread()
+	runtime.GOMAXPROCS(10)
 
 	color = allegro.CreateColor(100, 0, 0, 255)
 	color.Clear()
