@@ -7,6 +7,7 @@ package allegro
 import "C"
 import "unsafe"
 import "runtime"
+import "sync"
 
 const (
 	RESOURCES_PATH = C.ALLEGRO_RESOURCES_PATH
@@ -19,17 +20,21 @@ const (
 )
 
 var allegroThread = make(chan func())
-var threadRunning = false
+var threadRunning *sync.Once = new(sync.Once)
 
 func startThread() {
+	// Don't want to lock the only thread
+	if runtime.GOMAXPROCS(0) < 2 {
+		runtime.GOMAXPROCS(2)
+	}
 	go func() {
-		threadRunning = true
 		runtime.LockOSThread()
 		defer runtime.UnlockOSThread()
 
 		for f := range allegroThread {
 			f()
 		}
+		threadRunning = new(sync.Once)
 	}()
 }
 
@@ -39,9 +44,8 @@ func stopThread() {
 
 // Runs the function in the allegro thread
 func RunInThread(f func()) {
-	if !threadRunning {
-		startThread()
-	}
+	threadRunning.Do(startThread)
+
 	done := make(chan bool, 1)
 	wrapped := func() {
 		f()
