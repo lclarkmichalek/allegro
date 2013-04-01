@@ -61,80 +61,129 @@ const (
 type Display C.ALLEGRO_DISPLAY
 
 func CreateDisplay(width, height, flags int) *Display {
-	C.al_set_new_display_flags((C.int)(flags))
-	ptr := C.al_create_display((C.int)(width), (C.int)(height))
-	return (*Display)(ptr)
+	var d *Display
+	RunInThread(func() {
+		C.al_set_new_display_flags((C.int)(flags))
+		ptr := C.al_create_display((C.int)(width), (C.int)(height))
+		d = (*Display)(ptr)
+	})
+	return d
 }
 
 func (d *Display) Destroy() {
-	C.al_destroy_display((*C.ALLEGRO_DISPLAY)(d))
+	RunInThread(func() {
+		C.al_destroy_display((*C.ALLEGRO_DISPLAY)(d))
+	})
 }
 
 func SetNewDisplayOption(option, value, importance int) {
-	C.al_set_new_display_option((C.int)(option), (C.int)(value), (C.int)(importance))
+	RunInThread(func() {
+		C.al_set_new_display_option((C.int)(option), (C.int)(value), (C.int)(importance))
+	})
 }
 
 func ResetNewDisplayOptions() {
-	C.al_reset_new_display_options()
+	RunInThread(func() {
+		C.al_reset_new_display_options()
+	})
 }
 
 func GetNewWindowPosition() (int, int) {
 	var w, h C.int
-	C.al_get_new_window_position(&w, &h)
+	RunInThread(func() {
+		C.al_get_new_window_position(&w, &h)
+	})
 	return (int)(w), (int)(h)
 }
 
 func SetNewWindowPosition(w, h int) {
-	C.al_set_new_window_position((C.int)(w), (C.int)(h))
+	RunInThread(func() {
+		C.al_set_new_window_position((C.int)(w), (C.int)(h))
+	})
 }
 
 func GetNewDisplayRefreshRate() int {
-	return (int)(C.al_get_new_display_refresh_rate())
+	var v int
+	RunInThread(func() {
+		v = (int)(C.al_get_new_display_refresh_rate())
+	})
+	return v
 }
 
 func SetNewDisplayRefreshRate(ref int) {
-	C.al_set_new_display_refresh_rate((C.int)(ref))
+	RunInThread(func() {
+		C.al_set_new_display_refresh_rate((C.int)(ref))
+	})
 }
 
 func Flip() {
-	C.al_flip_display()
+	RunInThread(func() {
+		C.al_flip_display()
+	})
 }
 
 func FlipRegion(x, y, w, h int) {
-	C.al_update_display_region(C.int(x), C.int(y), C.int(w), C.int(h))
+	RunInThread(func() {
+		C.al_update_display_region(C.int(x), C.int(y), C.int(w), C.int(h))
+	})
 }
 
 func WaitVSync() bool {
-	return bool(C.al_wait_for_vsync())
+	var v bool
+	RunInThread(func() {
+		v = bool(C.al_wait_for_vsync())
+	})
+	return v
 }
 
 func (d *Display) GetEventSource() *EventSource {
-	src_ptr := C.al_get_display_event_source((*C.ALLEGRO_DISPLAY)(d))
-	return (*EventSource)(src_ptr)
+	var es *EventSource
+	RunInThread(func() {
+		src_ptr := C.al_get_display_event_source((*C.ALLEGRO_DISPLAY)(d))
+		es = (*EventSource)(src_ptr)
+	})
+	return es
 }
 
 func (d *Display) GetBackbuffer() *Bitmap {
-	return (*Bitmap)(C.al_get_backbuffer((*C.ALLEGRO_DISPLAY)(d)))
+	var b *Bitmap
+	RunInThread(func() {
+		b = (*Bitmap)(C.al_get_backbuffer((*C.ALLEGRO_DISPLAY)(d)))
+	})
+	return b
 }
 
 func (d *Display) GetDimensions() (int, int) {
 	ptr := (*C.ALLEGRO_DISPLAY)(d)
-	w := int(C.al_get_display_width(ptr))
-	h := int(C.al_get_display_height(ptr))
+	var w, h int
+	RunInThread(func() {
+		w = int(C.al_get_display_width(ptr))
+		h = int(C.al_get_display_height(ptr))
+	})
 	return w, h
 }
 
 func (d *Display) Resize(w, h int) bool {
-	return bool(C.al_resize_display((*C.ALLEGRO_DISPLAY)(d), C.int(w), C.int(h)))
+	var b bool
+	RunInThread(func() {
+		b = bool(C.al_resize_display((*C.ALLEGRO_DISPLAY)(d), C.int(w), C.int(h)))
+	})
+	return b
 }
 
 func (d *Display) AcknowledgeResize() bool {
-	return bool(C.al_acknowledge_resize((*C.ALLEGRO_DISPLAY)(d)))
+	var b bool
+	RunInThread(func() {
+		b = bool(C.al_acknowledge_resize((*C.ALLEGRO_DISPLAY)(d)))
+	})
+	return b
 }
 
 func (d *Display) GetPosition() (int, int) {
 	var x, y C.int
-	C.al_get_window_position((*C.ALLEGRO_DISPLAY)(d), &x, &y)
+	RunInThread(func() {
+		C.al_get_window_position((*C.ALLEGRO_DISPLAY)(d), &x, &y)
+	})
 	return int(x), int(y)
 }
 

@@ -6,7 +6,7 @@ import "strconv"
 func TestConfigLifecycle(t *testing.T) {
 	c := CreateConfig()
 	defer c.Destroy()
-	if c.ptr == nil {
+	if c == nil {
 		t.FailNow()
 	}
 }

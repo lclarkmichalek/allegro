@@ -10,36 +10,59 @@ type KeyboardState C.ALLEGRO_KEYBOARD_STATE
 
 
 func InstallKeyboard() {
-	C.al_install_keyboard()
+	RunInThread(func() {
+		C.al_install_keyboard()
+	})
 }
 
 func IsKeyboardInstalled() bool {
-	return bool(C.al_is_keyboard_installed())
+	var b bool
+	RunInThread(func() {
+		b = bool(C.al_is_keyboard_installed())
+	})
+	return b
 }
 
 func UninstallKeyboard() {
-	C.al_uninstall_keyboard()
+	RunInThread(func() {
+		C.al_uninstall_keyboard()
+	})
 }
 
 func GetKeyboadState() *KeyboardState {
 	var state C.ALLEGRO_KEYBOARD_STATE
-	C.al_get_keyboard_state(&state)
+	RunInThread(func() {
+		C.al_get_keyboard_state(&state)
+	})
 	return (*KeyboardState)(&state)
 }
 
 func (k *KeyboardState) KeyDown(keycode int) bool {
-	return bool(C.al_key_down((*C.ALLEGRO_KEYBOARD_STATE)(k), C.int(keycode)))
+	var b bool
+	RunInThread(func() {
+		b = bool(C.al_key_down((*C.ALLEGRO_KEYBOARD_STATE)(k), C.int(keycode)))
+	})
+	return b
 }
 
 func KeycodeToName(keycode int) string {
-	cs := C.al_keycode_to_name(C.int(keycode))
+	var cs *C.char
+	RunInThread(func() {
+		cs = C.al_keycode_to_name(C.int(keycode))
+	})
 	return C.GoString(cs)
 }
 
 func SetKeyboardLEDs(leds int) {
-	C.al_set_keyboard_leds(C.int(leds))
+	RunInThread(func() {
+		C.al_set_keyboard_leds(C.int(leds))
+	})
 }
 
 func GetKeyboardEventSource() *EventSource {
-	return (*EventSource)(C.al_get_keyboard_event_source())
+	var es *EventSource
+	RunInThread(func() {
+		es = (*EventSource)(C.al_get_keyboard_event_source())
+	})
+	return es
 }

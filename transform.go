@@ -33,35 +33,55 @@ func (t *Transform) Copy() *Transform {
 var current *Transform = nil
 
 func (t *Transform) Use() {
-	C.al_use_transform((*C.ALLEGRO_TRANSFORM)(t))
-	current = t
+	RunInThread(func() {
+		C.al_use_transform((*C.ALLEGRO_TRANSFORM)(t))
+		current = t
+	})
 }
 
 func GetCurrentTransform() *Transform {
-	return (*Transform)(C.al_get_current_transform())
+	var t *Transform
+	RunInThread(func() {
+		t = (*Transform)(C.al_get_current_transform())
+	})
+	return t
 }
 
 func (t *Transform) Invert() {
-	C.al_invert_transform((*C.ALLEGRO_TRANSFORM)(t))
+	RunInThread(func() {
+		C.al_invert_transform((*C.ALLEGRO_TRANSFORM)(t))
+	})
 }
 
 func (t *Transform) HasInverse(tolerance float32) bool {
-	return C.al_check_inverse((*C.ALLEGRO_TRANSFORM)(t), C.float(tolerance)) != C.int(0)
+	var b bool
+	RunInThread(func() {
+		b = C.al_check_inverse((*C.ALLEGRO_TRANSFORM)(t), C.float(tolerance)) != C.int(0)
+	})
+	return b
 }
 
 func (t *Transform) Identity() {
-	C.al_identity_transform((*C.ALLEGRO_TRANSFORM)(t))
+	RunInThread(func() {
+		C.al_identity_transform((*C.ALLEGRO_TRANSFORM)(t))
+	})
 }
 
 func (t *Transform) Build(x, y, sx, sy, theta float32) {
-	C.al_build_transform((*C.ALLEGRO_TRANSFORM)(t),
-		C.float(x), C.float(y), C.float(sx), C.float(sy), C.float(theta))
+	RunInThread(func() {
+		C.al_build_transform((*C.ALLEGRO_TRANSFORM)(t),
+			C.float(x), C.float(y), C.float(sx), C.float(sy), C.float(theta))
+	})
 }
 
 func (t *Transform) Translate(x, y float32) {
-	C.al_translate_transform((*C.ALLEGRO_TRANSFORM)(t), C.float(x), C.float(y))
+	RunInThread(func() {
+		C.al_translate_transform((*C.ALLEGRO_TRANSFORM)(t), C.float(x), C.float(y))
+	})
 }
 
 func (t *Transform) Compose(o *Transform) {
-	C.al_compose_transform((*C.ALLEGRO_TRANSFORM)(t), (*C.ALLEGRO_TRANSFORM)(o))
+	RunInThread(func() {
+		C.al_compose_transform((*C.ALLEGRO_TRANSFORM)(t), (*C.ALLEGRO_TRANSFORM)(o))
+	})
 }

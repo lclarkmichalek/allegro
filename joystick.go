@@ -14,36 +14,61 @@ type JoystickState struct {
 }
 
 func InstallJoystick() {
-	C.al_install_joystick()
+	RunInThread(func() {
+		C.al_install_joystick()
+	})
 }
 
 func UninstallJoystick() {
-	C.al_uninstall_joystick()
+	RunInThread(func() {
+		C.al_uninstall_joystick()
+	})
 }
 
 func IsJoystickInstalled() bool {
-	return bool(C.al_is_joystick_installed())
+	var b bool
+	RunInThread(func() {
+		b = bool(C.al_is_joystick_installed())
+	})
+	return b
 }
 
 func ReconfigureJoysticks() bool {
-	return bool(C.al_reconfigure_joysticks())
+	var b bool
+	RunInThread(func() {
+		b = bool(C.al_reconfigure_joysticks())
+	})
+	return b
 }
 
 func GetJoysticks() []*Joystick {
-	n := int(C.al_get_num_joysticks())
+	var n int
+	RunInThread(func() {
+		n = int(C.al_get_num_joysticks())
+	})
 	sticks := make([]*Joystick, n)
 	for i := 0; i < n; i++ {
-		stick := (*Joystick)(C.al_get_joystick(C.int(i)))
+		var stick *Joystick
+		RunInThread(func() {
+			stick = (*Joystick)(C.al_get_joystick(C.int(i)))
+		})
 		sticks[i] = stick
 	}
 	return sticks
 }
 
 func (j *Joystick) IsActive() bool {
-	return bool(C.al_get_joystick_active((*C.ALLEGRO_JOYSTICK)(j)))
+	var b bool
+	RunInThread(func() {
+		b = bool(C.al_get_joystick_active((*C.ALLEGRO_JOYSTICK)(j)))
+	})
+	return b
 }
 
 func (j *Joystick) GetName() string {
-	cs := C.al_get_joystick_name((*C.ALLEGRO_JOYSTICK)(j))
+	var cs *C.char
+	RunInThread(func() {
+		cs = C.al_get_joystick_name((*C.ALLEGRO_JOYSTICK)(j))
+	})
 	return C.GoString(cs)
 }

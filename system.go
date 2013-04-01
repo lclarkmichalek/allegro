@@ -6,6 +6,7 @@ package allegro
 */
 import "C"
 import "unsafe"
+import "runtime"
 
 const (
 	RESOURCES_PATH = C.ALLEGRO_RESOURCES_PATH
@@ -17,21 +18,63 @@ const (
 	EXENAME_PATH = C.ALLEGRO_EXENAME_PATH
 )
 
+var allegroThread = make(chan func())
+var threadRunning = false
+
+func startThread() {
+	go func() {
+		threadRunning = true
+		runtime.LockOSThread()
+		defer runtime.UnlockOSThread()
+
+		for f := range allegroThread {
+			f()
+		}
+	}()
+}
+
+func stopThread() {
+	close(allegroThread)
+}
+
+// Runs the function in the allegro thread
+func RunInThread(f func()) {
+	if !threadRunning {
+		startThread()
+	}
+	done := make(chan bool, 1)
+	wrapped := func() {
+		f()
+		done <- true
+	}
+	allegroThread <- wrapped
+	
+	// Wait till we're done in other thread
+	<-done
+}
+
 func Init() {
 	InstallSystem(int(C.ALLEGRO_VERSION_INT))
 }
 
 // Don't support callback version as no idea how to do that
 func InstallSystem(version int) {
-	C.al_install_system(C.int(version), nil)
+	RunInThread(func() {
+		C.al_install_system(C.int(version), nil)
+	})
 }
 
 func UninstallSystem() {
-	C.al_uninstall_system()
+	RunInThread(func() {
+		C.al_uninstall_system()
+	})
 }
 
 func GetVersion() (int, int, int, int) {
-	version := C.al_get_allegro_version()
+	var version C.uint32_t
+	RunInThread(func() {
+		version = C.al_get_allegro_version()
+	})
 	maj := int(version >> 24)
 	min := int((version >> 16) & 255)
 	rev := int((version >> 8) & 255)
@@ -40,7 +83,10 @@ func GetVersion() (int, int, int, int) {
 }
 
 func GetStandardPath(path int) Path {
-	pth := C.al_get_standard_path(C.int(path))
+	var pth *C.ALLEGRO_PATH
+	RunInThread(func() {
+		pth = C.al_get_standard_path(C.int(path))
+	})
 	return toPth(pth)
 }
 
@@ -48,31 +94,49 @@ func SetExeName(name string) {
 	ns := C.CString(name)
 	defer C.free(unsafe.Pointer(ns))
 	
-	C.al_set_exe_name(ns)
+	RunInThread(func() {
+		C.al_set_exe_name(ns)
+	})
 }
 
 func SetAppName(name string) {
 	ns := C.CString(name)
 	defer C.free(unsafe.Pointer(ns))
 	
-	C.al_set_app_name(ns)
+	RunInThread(func() {
+		C.al_set_app_name(ns)
+	})
 }
 
 func SetOrgName(name string) {
 	ns := C.CString(name)
 	defer C.free(unsafe.Pointer(ns))
 
-	C.al_set_org_name(ns)
+	RunInThread(func() {
+		C.al_set_org_name(ns)
+	})
 }
 
 func GetAppName() string {
-	return C.GoString(C.al_get_app_name())
+	var str string
+	RunInThread(func() {
+		str = C.GoString(C.al_get_app_name())
+	})
+	return str
 }
 
 func GetOrgName() string {
-	return C.GoString(C.al_get_org_name())
+	var str string
+	RunInThread(func() {
+		str = C.GoString(C.al_get_org_name())
+	})
+	return str
 }
 
 func GetSystemConfig() *Config {
-	return (*Config)(C.al_get_system_config())
+	var cnf *Config
+	RunInThread(func() {
+		cnf = (*Config)(C.al_get_system_config())
+	})
+	return cnf
 }
