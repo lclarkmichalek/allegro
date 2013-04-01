@@ -72,18 +72,12 @@ const (
 type Color C.ALLEGRO_COLOR
 
 func CreateColor(r, g, b, a byte) Color {
-	var c Color
-	RunInThread(func() {
-		c = (Color)(C.al_map_rgba(C.uchar(r), C.uchar(g), C.uchar(b), C.uchar(a)))
-	})
-	return c
+	return (Color)(C.al_map_rgba(C.uchar(r), C.uchar(g), C.uchar(b), C.uchar(a)))
 }
 
 func (c Color) GetRGBA() (byte, byte, byte, byte) {
 	var r, g, b, a C.uchar
-	RunInThread(func() {
-		C.al_unmap_rgba((C.ALLEGRO_COLOR)(c), &r, &g, &b, &a)
-	})
+	C.al_unmap_rgba((C.ALLEGRO_COLOR)(c), &r, &g, &b, &a)
 	return byte(r), byte(g), byte(b), byte(a)
 }
 

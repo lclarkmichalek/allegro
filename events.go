@@ -15,31 +15,18 @@ func GetEvents(sources []*EventSource) chan interface{} {
 
 	go func() {
 		var queue *C.ALLEGRO_EVENT_QUEUE
-		RunInThread(func() {
-			queue = C.al_create_event_queue()
-		})
-		defer RunInThread(func() {
-			C.al_destroy_event_queue(queue)
-		})
+		queue = C.al_create_event_queue()
+		defer C.al_destroy_event_queue(queue)
 	
 		for _, src := range sources {
 			ptr := (*C.ALLEGRO_EVENT_SOURCE)(src)
-			RunInThread(func() {
-				C.al_register_event_source(queue, ptr)
-			})
+			C.al_register_event_source(queue, ptr)
 		}
 
 		for {
 			var al_event C.ALLEGRO_EVENT
-			var got bool
-			RunInThread(func() {
-				got = bool(C.al_get_next_event(queue, &al_event))
-			})
-			for !got {
+			for !bool(C.al_get_next_event(queue, &al_event)) {
 				runtime.Gosched()
-				RunInThread(func() {
-					got = bool(C.al_get_next_event(queue, &al_event))
-				})
 			}
 
 			ev := toEv(al_event)
