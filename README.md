@@ -21,8 +21,6 @@ Things which aren't supported and should be:
 
  - `allegro_image`
  - `allegro_primitives`
- - `allegro_font`
- - `allegro_ttf`
  - `allegro_audio`
  - `allegro_acodec`
  - OpenGl compat/integration
