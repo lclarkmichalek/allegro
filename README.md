@@ -11,6 +11,9 @@ types simply by casting the types (i.e. (*C.ALLEGRO_DISPLAY)(disp) and vice
 versa). There are a couple of exceptions (well, just LockedRegion), but you can
 use the `.GetRaw()` method to get the raw pointer/data.
 
+That said, casting things outside of the allegro package does seem rather to not
+work, which is a shame.
+
 Allegro requires everything to be called from one hardware thread; to run a
 function in that thread, use `RunInThread`.
 
@@ -18,7 +21,6 @@ Things which aren't supported and should be:
 
  - `allegro_image`
  - `allegro_primitives`
- - `allegro_color`
  - `allegro_font`
  - `allegro_ttf`
  - `allegro_audio`
