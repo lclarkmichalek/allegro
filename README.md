@@ -19,7 +19,6 @@ function in that thread, use `RunInThread`.
 
 Things which aren't supported and should be:
 
- - `allegro_image`
  - `allegro_primitives`
  - `allegro_audio`
  - `allegro_acodec`
