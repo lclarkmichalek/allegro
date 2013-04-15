@@ -10,13 +10,13 @@ import "runtime"
 import "sync"
 
 const (
-	RESOURCES_PATH = C.ALLEGRO_RESOURCES_PATH
-	TEMP_PATH = C.ALLEGRO_TEMP_PATH
-	USER_HOME_PATH = C.ALLEGRO_USER_HOME_PATH
+	RESOURCES_PATH      = C.ALLEGRO_RESOURCES_PATH
+	TEMP_PATH           = C.ALLEGRO_TEMP_PATH
+	USER_HOME_PATH      = C.ALLEGRO_USER_HOME_PATH
 	USER_DOCUMENTS_PATH = C.ALLEGRO_USER_DOCUMENTS_PATH
-	USER_DATA_PATH = C.ALLEGRO_USER_DATA_PATH
-	USER_SETTINGS_PATH = C.ALLEGRO_USER_SETTINGS_PATH
-	EXENAME_PATH = C.ALLEGRO_EXENAME_PATH
+	USER_DATA_PATH      = C.ALLEGRO_USER_DATA_PATH
+	USER_SETTINGS_PATH  = C.ALLEGRO_USER_SETTINGS_PATH
+	EXENAME_PATH        = C.ALLEGRO_EXENAME_PATH
 )
 
 var allegroThread = make(chan func())
@@ -52,7 +52,7 @@ func RunInThread(f func()) {
 		done <- true
 	}
 	allegroThread <- wrapped
-	
+
 	// Wait till we're done in other thread
 	<-done
 }
@@ -97,7 +97,7 @@ func GetStandardPath(path int) Path {
 func SetExeName(name string) {
 	ns := C.CString(name)
 	defer C.free(unsafe.Pointer(ns))
-	
+
 	RunInThread(func() {
 		C.al_set_exe_name(ns)
 	})
@@ -106,7 +106,7 @@ func SetExeName(name string) {
 func SetAppName(name string) {
 	ns := C.CString(name)
 	defer C.free(unsafe.Pointer(ns))
-	
+
 	RunInThread(func() {
 		C.al_set_app_name(ns)
 	})

@@ -64,7 +64,7 @@ func (c *Config) Get(section string, key string) (string, bool) {
 	RunInThread(func() {
 		cstr = C.al_get_config_value((*C.ALLEGRO_CONFIG)(c), ss, ks)
 	})
-	if (cstr == nil) {
+	if cstr == nil {
 		return "", false
 	}
 	return C.GoString(cstr), true
@@ -87,7 +87,7 @@ func (c *Config) IterSections() chan string {
 	channel := make(chan string)
 	go func() {
 		var iter **C.ALLEGRO_CONFIG_SECTION
-		
+
 		var name_ptr *C.char
 
 		RunInThread(func() {

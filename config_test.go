@@ -14,7 +14,7 @@ func TestConfigLifecycle(t *testing.T) {
 func TestIterSections(t *testing.T) {
 	c := CreateConfig()
 	defer c.Destroy()
-	
+
 	sectionNames := [3]string{"asd", "bsd", "csd"}
 	for _, name := range sectionNames {
 		c.AddSection(name)

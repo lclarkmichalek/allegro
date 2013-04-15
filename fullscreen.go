@@ -9,8 +9,8 @@ import "C"
 
 type DisplayMode struct {
 	Width, Height int
-	Format int
-	RefreshRate int
+	Format        int
+	RefreshRate   int
 }
 
 func DisplayModes() []DisplayMode {

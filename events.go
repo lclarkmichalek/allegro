@@ -6,7 +6,6 @@ package allegro
 #include "./event_getter.h"
 */
 import "C"
-import "runtime"
 
 type EventSource C.ALLEGRO_EVENT_SOURCE
 
@@ -17,7 +16,7 @@ func GetEvents(sources []*EventSource) chan interface{} {
 		var queue *C.ALLEGRO_EVENT_QUEUE
 		queue = C.al_create_event_queue()
 		defer C.al_destroy_event_queue(queue)
-	
+
 		for _, src := range sources {
 			ptr := (*C.ALLEGRO_EVENT_SOURCE)(src)
 			C.al_register_event_source(queue, ptr)
@@ -25,12 +24,10 @@ func GetEvents(sources []*EventSource) chan interface{} {
 
 		for {
 			var al_event C.ALLEGRO_EVENT
-			for !bool(C.al_get_next_event(queue, &al_event)) {
-				runtime.Gosched()
-			}
+			C.al_wait_for_event(queue, &al_event)
 
 			ev := toEv(al_event)
-			if (ev != nil) {
+			if ev != nil {
 				ch <- ev
 			}
 		}
@@ -47,7 +44,7 @@ func toEv(ev C.ALLEGRO_EVENT) interface{} {
 	display := C.get_display(ev)
 	keyboard := C.get_keyboard(ev)
 	timer := C.get_timer(ev)
-	switch (C.get_type(ev)) {
+	switch C.get_type(ev) {
 	case C.ALLEGRO_EVENT_JOYSTICK_AXIS:
 		return JoystickAxisEvent{
 			src, ts,
@@ -66,7 +63,7 @@ func toEv(ev C.ALLEGRO_EVENT) interface{} {
 			(*Joystick)(joystick.id),
 			int(joystick.button)}
 	case C.ALLEGRO_EVENT_JOYSTICK_CONFIGURATION:
-		return JoystickConfigurationEvent{ src, ts }
+		return JoystickConfigurationEvent{src, ts}
 	case C.ALLEGRO_EVENT_KEY_DOWN:
 		return KeyDownEvent{
 			src, ts,

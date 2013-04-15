@@ -9,7 +9,7 @@ import "C"
 type Joystick C.ALLEGRO_JOYSTICK
 
 type JoystickState struct {
-	Axes [][]float32
+	Axes    [][]float32
 	Buttons []int
 }
 

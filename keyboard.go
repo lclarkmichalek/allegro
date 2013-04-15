@@ -8,7 +8,6 @@ import "C"
 
 type KeyboardState C.ALLEGRO_KEYBOARD_STATE
 
-
 func InstallKeyboard() {
 	RunInThread(func() {
 		C.al_install_keyboard()

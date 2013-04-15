@@ -7,7 +7,7 @@ package allegro
 import "C"
 import "unsafe"
 
-type Path struct { ptr unsafe.Pointer }
+type Path struct{ ptr unsafe.Pointer }
 
 func fromPth(p Path) *[0]byte {
 	return (*[0]byte)(p.ptr)
