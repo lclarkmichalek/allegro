@@ -117,7 +117,7 @@ type TimerEvent struct {
 	Source    *EventSource
 	Timestamp float64
 	Timer     *Timer
-	Count     int
+	Count     int64
 }
 
 type DisplayExposeEvent struct {

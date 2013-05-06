@@ -140,7 +140,7 @@ func toEv(ev C.ALLEGRO_EVENT) interface{} {
 		return TimerEvent{
 			src, ts,
 			(*Timer)(timer.source),
-			int(timer.count)}
+			int64(timer.count)}
 	case C.ALLEGRO_EVENT_DISPLAY_EXPOSE:
 		return DisplayExposeEvent{
 			src, ts,
