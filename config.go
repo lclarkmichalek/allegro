@@ -86,18 +86,18 @@ func (c *Config) Set(section string, key string, val string) {
 func (c *Config) IterSections() chan string {
 	channel := make(chan string)
 	go func() {
-		var iter **C.ALLEGRO_CONFIG_SECTION
+		var iter *C.ALLEGRO_CONFIG_SECTION
 
 		var name_ptr *C.char
 
 		RunInThread(func() {
-			name_ptr = C.al_get_first_config_section((*C.ALLEGRO_CONFIG)(c), iter)
+			name_ptr = C.al_get_first_config_section((*C.ALLEGRO_CONFIG)(c), &iter)
 		})
 		for name_ptr != nil {
 			name := C.GoString(name_ptr)
 			channel <- name
 			RunInThread(func() {
-				name_ptr = C.al_get_next_config_section(iter)
+				name_ptr = C.al_get_next_config_section(&iter)
 			})
 		}
 		close(channel)
@@ -108,19 +108,19 @@ func (c *Config) IterSections() chan string {
 func (c *Config) IterKeys(sec string) chan string {
 	channel := make(chan string)
 	go func() {
-		var iter **C.ALLEGRO_CONFIG_ENTRY
+		var iter *C.ALLEGRO_CONFIG_ENTRY
 		ss := C.CString(sec)
 		defer C.free(unsafe.Pointer(ss))
 
 		var key_ptr *C.char
 		RunInThread(func() {
-			key_ptr = C.al_get_first_config_entry((*C.ALLEGRO_CONFIG)(c), ss, iter)
+			key_ptr = C.al_get_first_config_entry((*C.ALLEGRO_CONFIG)(c), ss, &iter)
 		})
 		for key_ptr != nil {
 			key := C.GoString(key_ptr)
 			channel <- key
 			RunInThread(func() {
-				key_ptr = C.al_get_next_config_entry(iter)
+				key_ptr = C.al_get_next_config_entry(&iter)
 			})
 		}
 		close(channel)
