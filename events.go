@@ -7,10 +7,36 @@ package allegro
 */
 import "C"
 
-type EventSource C.ALLEGRO_EVENT_SOURCE
+import "sync"
+
+type EventSource struct {
+	// Send anything on this channel to stop any GetEvents calls on this source
+	stopped chan bool
+	// The actual event source
+	src *C.ALLEGRO_EVENT_SOURCE
+}
+
+func createEventSource(src *C.ALLEGRO_EVENT_SOURCE) *EventSource {
+	var es EventSource
+	es.stopped = make(chan bool)
+	es.src = src
+	return &es
+}
+
+func (es *EventSource) StopGetEvents() {
+	es.stopped <- true
+}
 
 func GetEvents(sources []*EventSource) chan interface{} {
 	ch := make(chan interface{}, 10)
+
+	sourcesStopped := make(chan bool)
+	for _, evSrc := range sources {
+		go func() {
+			<- evSrc.stopped
+			sourcesStopped <- true
+		} ()
+	}
 
 	go func() {
 		var queue *C.ALLEGRO_EVENT_QUEUE
@@ -18,13 +44,25 @@ func GetEvents(sources []*EventSource) chan interface{} {
 		defer C.al_destroy_event_queue(queue)
 
 		for _, src := range sources {
-			ptr := (*C.ALLEGRO_EVENT_SOURCE)(src)
+			ptr := (*C.ALLEGRO_EVENT_SOURCE)(src.src)
 			C.al_register_event_source(queue, ptr)
 		}
 
-		for {
+		stopped := false
+		for !stopped {
+			var gotEv sync.Mutex
 			var al_event C.ALLEGRO_EVENT
-			C.al_wait_for_event(queue, &al_event)
+			gotEv.Lock()
+			go func() {
+				C.al_wait_for_event(queue, &al_event)
+				gotEv.Unlock()
+			} ()
+			go func() {
+				<- sourcesStopped
+				stopped = true
+				gotEv.Unlock()
+			} ()
+			gotEv.Lock()
 
 			ev := toEv(al_event)
 			if ev != nil {
@@ -37,7 +75,7 @@ func GetEvents(sources []*EventSource) chan interface{} {
 
 func toEv(ev C.ALLEGRO_EVENT) interface{} {
 	any := C.get_any(ev)
-	src := (*EventSource)(any.source)
+	src := createEventSource(any.source)
 	ts := float64(any.timestamp)
 	joystick := C.get_joystick(ev)
 	mouse := C.get_mouse(ev)

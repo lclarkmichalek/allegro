@@ -137,12 +137,12 @@ func WaitVSync() bool {
 }
 
 func (d *Display) GetEventSource() *EventSource {
-	var es *EventSource
+	var es *C.ALLEGRO_EVENT_SOURCE
 	RunInThread(func() {
 		src_ptr := C.al_get_display_event_source((*C.ALLEGRO_DISPLAY)(d))
-		es = (*EventSource)(src_ptr)
+		es = src_ptr
 	})
-	return es
+	return createEventSource(es)
 }
 
 func (d *Display) GetBackbuffer() *Bitmap {

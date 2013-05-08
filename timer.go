@@ -77,9 +77,9 @@ func (t *Timer) SetSpeed(speed float64) {
 }
 
 func (t *Timer) GetEventSource() *EventSource {
-	var es *EventSource
+	var es *C.ALLEGRO_EVENT_SOURCE
 	RunInThread(func() {
-		es = (*EventSource)(C.al_get_timer_event_source((*C.ALLEGRO_TIMER)(t)))
+		es = C.al_get_timer_event_source((*C.ALLEGRO_TIMER)(t))
 	})
-	return es
+	return createEventSource(es)
 }

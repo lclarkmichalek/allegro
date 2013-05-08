@@ -17,6 +17,14 @@ work, which is a shame.
 Allegro requires everything to be called from one hardware thread; to run a
 function in that thread, use `RunInThread`.
 
+One problem with the way that iteration is done in this package is
+that it has the potential to leave a lot of goroutines lying
+around. For example, if you iterate through the sections of a config,
+and then break instead of letting the iteration finish naturally, the
+go routine will never be collected. To avoid this in handling events,
+you can clean up any calls to GetEvents by calling EventSource.Stop on
+any of the sources that were passed to GetEvents.
+
 Things which aren't supported and should be:
 
  - `allegro_primitives`

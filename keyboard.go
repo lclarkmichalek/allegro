@@ -59,9 +59,9 @@ func SetKeyboardLEDs(leds int) {
 }
 
 func GetKeyboardEventSource() *EventSource {
-	var es *EventSource
+	var es *C.ALLEGRO_EVENT_SOURCE
 	RunInThread(func() {
-		es = (*EventSource)(C.al_get_keyboard_event_source())
+		es = C.al_get_keyboard_event_source()
 	})
-	return es
+	return createEventSource(es)
 }

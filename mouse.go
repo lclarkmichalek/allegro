@@ -118,11 +118,11 @@ func SetMouseAxis(which, value int) bool {
 }
 
 func GetMouseEventSource() *EventSource {
-	var es *EventSource
+	var es *C.ALLEGRO_EVENT_SOURCE
 	RunInThread(func() {
-		es = (*EventSource)(C.al_get_mouse_event_source())
+		es = C.al_get_mouse_event_source()
 	})
-	return es
+	return createEventSource(es)
 }
 
 type MouseCursor C.ALLEGRO_MOUSE_CURSOR
