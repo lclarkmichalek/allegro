@@ -80,8 +80,28 @@ func (t *Transform) Translate(x, y float32) {
 	})
 }
 
+func (t *Transform) Rotate(theta float32) {
+	RunInThread(func() {
+		C.al_rotate_transform((*C.ALLEGRO_TRANSFORM)(t), C.float(theta))
+	})
+}
+
+func (t *Transform) Scale(sx, sy float32) {
+	RunInThread(func() {
+		C.al_scale_transform((*C.ALLEGRO_TRANSFORM)(t), C.float(sx), C.float(sy))
+	})
+}
+
 func (t *Transform) Compose(o *Transform) {
 	RunInThread(func() {
 		C.al_compose_transform((*C.ALLEGRO_TRANSFORM)(t), (*C.ALLEGRO_TRANSFORM)(o))
 	})
+}
+
+func (t *Transform) Apply(x, y float32) (float32, float32) {
+	RunInThread(func() {
+		C.al_transform_coordinates((*C.ALLEGRO_TRANSFORM)(t),
+			(*C.float)(&x), (*C.float)(&y))
+	})
+	return x, y
 }
