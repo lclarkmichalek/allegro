@@ -35,7 +35,6 @@ Things which aren't supported and should be:
  - `allegro_primitives`
  - `allegro_audio`
  - `allegro_acodec`
- - OpenGl compat/integration
 
 Things which aren't supported and won't be:
 
