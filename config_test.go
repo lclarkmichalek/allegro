@@ -19,7 +19,7 @@ func TestIterSections(t *testing.T) {
 		c.AddSection(name)
 	}
 	found := make([]string, 0, len(sectionNames))
-	
+
 	for secname := range c.IterSections() {
 		found = append(found, secname)
 	}
@@ -56,7 +56,7 @@ func TestIterKeys(t *testing.T) {
 	keyNames := []string{"foo", "bar", "asd"}
 
 	found := make([]string, 0, len(keyNames))
-	
+
 	for keyName := range c.IterKeys(sectionName) {
 		found = append(found, keyName)
 	}

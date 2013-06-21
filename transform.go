@@ -33,75 +33,75 @@ func (t *Transform) Copy() *Transform {
 var current *Transform = nil
 
 func (t *Transform) Use() {
-	RunInThread(func() {
-		C.al_use_transform((*C.ALLEGRO_TRANSFORM)(t))
-		current = t
-	})
+
+	C.al_use_transform((*C.ALLEGRO_TRANSFORM)(t))
+	current = t
+
 }
 
 func GetCurrentTransform() *Transform {
 	var t *Transform
-	RunInThread(func() {
-		t = (*Transform)(C.al_get_current_transform())
-	})
+
+	t = (*Transform)(C.al_get_current_transform())
+
 	return t
 }
 
 func (t *Transform) Invert() {
-	RunInThread(func() {
-		C.al_invert_transform((*C.ALLEGRO_TRANSFORM)(t))
-	})
+
+	C.al_invert_transform((*C.ALLEGRO_TRANSFORM)(t))
+
 }
 
 func (t *Transform) HasInverse(tolerance float32) bool {
 	var b bool
-	RunInThread(func() {
-		b = C.al_check_inverse((*C.ALLEGRO_TRANSFORM)(t), C.float(tolerance)) != C.int(0)
-	})
+
+	b = C.al_check_inverse((*C.ALLEGRO_TRANSFORM)(t), C.float(tolerance)) != C.int(0)
+
 	return b
 }
 
 func (t *Transform) Identity() {
-	RunInThread(func() {
-		C.al_identity_transform((*C.ALLEGRO_TRANSFORM)(t))
-	})
+
+	C.al_identity_transform((*C.ALLEGRO_TRANSFORM)(t))
+
 }
 
 func (t *Transform) Build(x, y, sx, sy, theta float32) {
-	RunInThread(func() {
-		C.al_build_transform((*C.ALLEGRO_TRANSFORM)(t),
-			C.float(x), C.float(y), C.float(sx), C.float(sy), C.float(theta))
-	})
+
+	C.al_build_transform((*C.ALLEGRO_TRANSFORM)(t),
+		C.float(x), C.float(y), C.float(sx), C.float(sy), C.float(theta))
+
 }
 
 func (t *Transform) Translate(x, y float32) {
-	RunInThread(func() {
-		C.al_translate_transform((*C.ALLEGRO_TRANSFORM)(t), C.float(x), C.float(y))
-	})
+
+	C.al_translate_transform((*C.ALLEGRO_TRANSFORM)(t), C.float(x), C.float(y))
+
 }
 
 func (t *Transform) Rotate(theta float32) {
-	RunInThread(func() {
-		C.al_rotate_transform((*C.ALLEGRO_TRANSFORM)(t), C.float(theta))
-	})
+
+	C.al_rotate_transform((*C.ALLEGRO_TRANSFORM)(t), C.float(theta))
+
 }
 
 func (t *Transform) Scale(sx, sy float32) {
-	RunInThread(func() {
-		C.al_scale_transform((*C.ALLEGRO_TRANSFORM)(t), C.float(sx), C.float(sy))
-	})
+
+	C.al_scale_transform((*C.ALLEGRO_TRANSFORM)(t), C.float(sx), C.float(sy))
+
 }
 
 func (t *Transform) Compose(o *Transform) {
-	RunInThread(func() {
-		C.al_compose_transform((*C.ALLEGRO_TRANSFORM)(t), (*C.ALLEGRO_TRANSFORM)(o))
-	})
+
+	C.al_compose_transform((*C.ALLEGRO_TRANSFORM)(t), (*C.ALLEGRO_TRANSFORM)(o))
+
 }
 
 func (t *Transform) Apply(x, y float32) (float32, float32) {
-	RunInThread(func() {
-		C.al_transform_coordinates((*C.ALLEGRO_TRANSFORM)(t),
-			(*C.float)(&x), (*C.float)(&y))
-	})
+
+	C.al_transform_coordinates((*C.ALLEGRO_TRANSFORM)(t),
+		(*C.float)(&x), (*C.float)(&y))
+
 	return x, y
 }

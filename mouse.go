@@ -32,9 +32,9 @@ type MouseState C.ALLEGRO_MOUSE_STATE
 
 func GetMouseState() MouseState {
 	var ms MouseState
-	RunInThread(func() {
-		C.al_get_mouse_state((*C.ALLEGRO_MOUSE_STATE)(&ms))
-	})
+
+	C.al_get_mouse_state((*C.ALLEGRO_MOUSE_STATE)(&ms))
+
 	return ms
 }
 
@@ -44,46 +44,46 @@ func (m MouseState) GetPos() (int, int, int, int) {
 }
 
 func InstallMouse() {
-	RunInThread(func() {
-		C.al_install_mouse()
-	})
+
+	C.al_install_mouse()
+
 }
 
 func IsMouseInstalled() bool {
 	var b bool
-	RunInThread(func() {
-		b = bool(C.al_is_mouse_installed())
-	})
+
+	b = bool(C.al_is_mouse_installed())
+
 	return b
 }
 
 func UninstallMouse() {
-	RunInThread(func() {
-		C.al_uninstall_mouse()
-	})
+
+	C.al_uninstall_mouse()
+
 }
 
 func (m MouseState) GetAxes() []int {
 	var n int
-	RunInThread(func() {
-		n = int(C.al_get_mouse_num_axes())
-	})
+
+	n = int(C.al_get_mouse_num_axes())
+
 	ms := (C.ALLEGRO_MOUSE_STATE)(m)
 	slice := make([]int, n)
 	for i := 0; i < n; i++ {
-		RunInThread(func() {
-			axis := int(C.al_get_mouse_state_axis(&ms, C.int(i)))
-			slice[i] = axis
-		})
+
+		axis := int(C.al_get_mouse_state_axis(&ms, C.int(i)))
+		slice[i] = axis
+
 	}
 	return slice
 }
 
 func (m MouseState) GetButtons() []bool {
 	var n int
-	RunInThread(func() {
-		n = int(C.al_get_mouse_num_buttons())
-	})
+
+	n = int(C.al_get_mouse_num_buttons())
+
 	ms := (C.ALLEGRO_MOUSE_STATE)(m)
 	slice := make([]bool, n)
 	for i := uint(0); i < uint(n); i++ {
@@ -95,33 +95,33 @@ func (m MouseState) GetButtons() []bool {
 
 func (d *Display) SetMouse(x, y int) bool {
 	var b bool
-	RunInThread(func() {
-		b = bool(C.al_set_mouse_xy((*C.ALLEGRO_DISPLAY)(d), C.int(x), C.int(y)))
-	})
+
+	b = bool(C.al_set_mouse_xy((*C.ALLEGRO_DISPLAY)(d), C.int(x), C.int(y)))
+
 	return b
 }
 
 func SetMouseWZ(w, z int) bool {
 	var b bool
-	RunInThread(func() {
-		b = bool(C.al_set_mouse_w(C.int(w))) && bool(C.al_set_mouse_z(C.int(z)))
-	})
+
+	b = bool(C.al_set_mouse_w(C.int(w))) && bool(C.al_set_mouse_z(C.int(z)))
+
 	return b
 }
 
 func SetMouseAxis(which, value int) bool {
 	var b bool
-	RunInThread(func() {
-		b = bool(C.al_set_mouse_axis(C.int(which), C.int(value)))
-	})
+
+	b = bool(C.al_set_mouse_axis(C.int(which), C.int(value)))
+
 	return b
 }
 
 func GetMouseEventSource() *EventSource {
 	var es *C.ALLEGRO_EVENT_SOURCE
-	RunInThread(func() {
-		es = C.al_get_mouse_event_source()
-	})
+
+	es = C.al_get_mouse_event_source()
+
 	return createEventSource(es)
 }
 
@@ -129,53 +129,53 @@ type MouseCursor C.ALLEGRO_MOUSE_CURSOR
 
 func CreateMouseCursor(bmp *Bitmap, x, y int) *MouseCursor {
 	var mc *MouseCursor
-	RunInThread(func() {
-		mc = (*MouseCursor)(C.al_create_mouse_cursor(
-			(*C.ALLEGRO_MOUSE_CURSOR)(bmp), C.int(x), C.int(y)))
-	})
+
+	mc = (*MouseCursor)(C.al_create_mouse_cursor(
+		(*C.ALLEGRO_MOUSE_CURSOR)(bmp), C.int(x), C.int(y)))
+
 	return mc
 }
 
 func (mc *MouseCursor) Destroy() {
-	RunInThread(func() {
-		C.al_destroy_mouse_cursor((*C.ALLEGRO_MOUSE_CURSOR)(mc))
-	})
+
+	C.al_destroy_mouse_cursor((*C.ALLEGRO_MOUSE_CURSOR)(mc))
+
 }
 
 func (d *Display) SetMouseCursor(mc *MouseCursor) {
-	RunInThread(func() {
-		C.al_set_mouse_cursor((*C.ALLEGRO_DISPLAY)(d), (*C.ALLEGRO_MOUSE_CURSOR)(mc))
-	})
+
+	C.al_set_mouse_cursor((*C.ALLEGRO_DISPLAY)(d), (*C.ALLEGRO_MOUSE_CURSOR)(mc))
+
 }
 
 func (d *Display) SetSystemCursor(cursor C.ALLEGRO_SYSTEM_MOUSE_CURSOR) bool {
 	var b bool
-	RunInThread(func() {
-		b = bool(C.al_set_system_mouse_cursor((*C.ALLEGRO_DISPLAY)(d), cursor))
-	})
+
+	b = bool(C.al_set_system_mouse_cursor((*C.ALLEGRO_DISPLAY)(d), cursor))
+
 	return b
 }
 
 func (d *Display) ShowCursor(show bool) {
 	if show {
-		RunInThread(func() {
-			C.al_show_mouse_cursor((*C.ALLEGRO_DISPLAY)(d))
-		})
+
+		C.al_show_mouse_cursor((*C.ALLEGRO_DISPLAY)(d))
+
 	} else {
-		RunInThread(func() {
-			C.al_hide_mouse_cursor((*C.ALLEGRO_DISPLAY)(d))
-		})
+
+		C.al_hide_mouse_cursor((*C.ALLEGRO_DISPLAY)(d))
+
 	}
 }
 
 func (d *Display) GrabCursor(grab bool) {
 	if grab {
-		RunInThread(func() {
-			C.al_grab_mouse((*C.ALLEGRO_DISPLAY)(d))
-		})
+
+		C.al_grab_mouse((*C.ALLEGRO_DISPLAY)(d))
+
 	} else {
-		RunInThread(func() {
-			C.al_ungrab_mouse()
-		})
+
+		C.al_ungrab_mouse()
+
 	}
 }

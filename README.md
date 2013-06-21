@@ -1,6 +1,14 @@
 Bindings for the Allegro library for Go
 ---------------------------------------
 
+**Allegro requires everything to be called from one hardware
+thread.** You will have to do this yourself. I recommend using a pattern
+similar to the one described [here](
+http://code.google.com/p/go-wiki/wiki/LockOSThread). This will allow
+you to run functions in a single, unchanging hardware thread. There
+are some allegro functions that do not require this thread locking,
+but they're not well documented, and shouldn't be relied upon.
+
 Documentation? Ha! Read the allegro docs. Almost everything mirrors the allegro
 C library (major exceptions are anything to do with iteration). Things have been
 "object orientified" somewhat: `al_destroy_display` -> `display.Destroy` and the
@@ -13,9 +21,6 @@ use the `.GetRaw()` method to get the raw pointer/data.
 
 That said, casting things outside of the allegro package does seem rather to not
 work, which is a shame.
-
-Allegro requires everything to be called from one hardware thread; to run a
-function in that thread, use `RunInThread`.
 
 One problem with the way that iteration is done in this package is
 that it has the potential to leave a lot of goroutines lying

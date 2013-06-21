@@ -82,27 +82,19 @@ func (c Color) GetRGBA() (byte, byte, byte, byte) {
 }
 
 func (c Color) Clear() {
-	RunInThread(func() {
-		C.al_clear_to_color((C.ALLEGRO_COLOR)(c))
-	})
+	C.al_clear_to_color((C.ALLEGRO_COLOR)(c))
 }
 
 func (c Color) DrawPixel(x, y float32) {
-	RunInThread(func() {
-		C.al_draw_pixel(C.float(x), C.float(y), (C.ALLEGRO_COLOR)(c))
-	})
+	C.al_draw_pixel(C.float(x), C.float(y), (C.ALLEGRO_COLOR)(c))
 }
 
 func (c Color) PutPixel(x, y int) {
-	RunInThread(func() {
-		C.al_put_pixel(C.int(x), C.int(y), (C.ALLEGRO_COLOR)(c))
-	})
+	C.al_put_pixel(C.int(x), C.int(y), (C.ALLEGRO_COLOR)(c))
 }
 
 func (c Color) PutBlendedPixel(x, y int) {
-	RunInThread(func() {
-		C.al_put_blended_pixel(C.int(x), C.int(y), (C.ALLEGRO_COLOR)(c))
-	})
+	C.al_put_blended_pixel(C.int(x), C.int(y), (C.ALLEGRO_COLOR)(c))
 }
 
 type LockedRegion struct {
@@ -144,306 +136,289 @@ func (l *LockedRegion) GetPixelSize() int {
 
 func (b *Bitmap) Lock(format, flags int) LockedRegion {
 	w, h := b.GetDimensions()
-	var ptr *C.ALLEGRO_LOCKED_REGION
-	RunInThread(func() {
-		ptr = C.al_lock_bitmap((*C.ALLEGRO_BITMAP)(b), C.int(format), C.int(flags))
-	})
+	ptr := C.al_lock_bitmap((*C.ALLEGRO_BITMAP)(b), C.int(format), C.int(flags))
 	return CreateLockedRegion(ptr, w, h)
 }
 
 func (b *Bitmap) LockRegion(x, y, w, h, format, flags int) LockedRegion {
-	var ptr *C.ALLEGRO_LOCKED_REGION
-	RunInThread(func() {
-		ptr = C.al_lock_bitmap_region((*C.ALLEGRO_BITMAP)(b), C.int(x), C.int(y),
-			C.int(w), C.int(h), C.int(format), C.int(flags))
-	})
+	ptr := C.al_lock_bitmap_region((*C.ALLEGRO_BITMAP)(b), C.int(x), C.int(y),
+		C.int(w), C.int(h), C.int(format), C.int(flags))
 	return CreateLockedRegion(ptr, w, h)
 }
 
 func (b *Bitmap) Unlock() {
-	RunInThread(func() {
-		C.al_unlock_bitmap((*C.ALLEGRO_BITMAP)(b))
-	})
+	C.al_unlock_bitmap((*C.ALLEGRO_BITMAP)(b))
 }
 
 func GetPixelSize(format int) int {
-	var s int
-	RunInThread(func() {
-		s = int(C.al_get_pixel_size(C.int(format)))
-	})
+	s := int(C.al_get_pixel_size(C.int(format)))
 	return s
 }
 
 func GetNewBitmapFlags() int {
-	var f int
-	RunInThread(func() {
-		f = int(C.al_get_new_bitmap_flags())
-	})
+	f := int(C.al_get_new_bitmap_flags())
 	return f
 }
 
 func GetNewBitmapFormat() int {
-	var f int
-	RunInThread(func() {
-		f = int(C.al_get_new_bitmap_format())
-	})
+	f := int(C.al_get_new_bitmap_format())
 	return f
 }
 
 func SetNewBitmapFlags(flags int) {
-	RunInThread(func() {
-		C.al_set_new_bitmap_flags(C.int(flags))
-	})
+
+	C.al_set_new_bitmap_flags(C.int(flags))
+
 }
 
 func SetNewBitmapFormat(format int) {
-	RunInThread(func() {
-		C.al_set_new_bitmap_format(C.int(format))
-	})
+
+	C.al_set_new_bitmap_format(C.int(format))
+
 }
 
 type Bitmap C.ALLEGRO_BITMAP
 
 func NewBitmap(w, h int) *Bitmap {
 	var b *Bitmap
-	RunInThread(func() {
-		b = (*Bitmap)(C.al_create_bitmap(C.int(w), C.int(h)))
-	})
+
+	b = (*Bitmap)(C.al_create_bitmap(C.int(w), C.int(h)))
+
 	return b
 }
 
 func GetTargetBitmap() *Bitmap {
 	var b *Bitmap
-	RunInThread(func() {
-		b = (*Bitmap)(C.al_get_target_bitmap())
-	})
+
+	b = (*Bitmap)(C.al_get_target_bitmap())
+
 	return b
 }
 
 func (b *Bitmap) Destroy() {
-	RunInThread(func() {
-		C.al_destroy_bitmap((*C.ALLEGRO_BITMAP)(b))
-	})
+
+	C.al_destroy_bitmap((*C.ALLEGRO_BITMAP)(b))
+
 }
 
 func (b *Bitmap) CreateSubBitmap(x, y, w, h int) *Bitmap {
 	var sub *Bitmap
-	RunInThread(func() {
-		sub = (*Bitmap)(C.al_create_sub_bitmap((*C.ALLEGRO_BITMAP)(b),
-			C.int(x), C.int(y), C.int(w), C.int(h)))
-	})
+
+	sub = (*Bitmap)(C.al_create_sub_bitmap((*C.ALLEGRO_BITMAP)(b),
+		C.int(x), C.int(y), C.int(w), C.int(h)))
+
 	return sub
 }
 
 func (b *Bitmap) Clone() *Bitmap {
 	var n *Bitmap
-	RunInThread(func() {
-		n = (*Bitmap)(C.al_clone_bitmap((*C.ALLEGRO_BITMAP)(b)))
-	})
+
+	n = (*Bitmap)(C.al_clone_bitmap((*C.ALLEGRO_BITMAP)(b)))
+
 	return n
 }
 
 func (b *Bitmap) GetDimensions() (int, int) {
 	ptr := (*C.ALLEGRO_BITMAP)(b)
 	var w, h C.int
-	RunInThread(func() {
-		w = C.al_get_bitmap_width(ptr)
-		h = C.al_get_bitmap_height(ptr)
-	})
+
+	w = C.al_get_bitmap_width(ptr)
+	h = C.al_get_bitmap_height(ptr)
+
 	return int(w), int(h)
 }
 
 func (b *Bitmap) GetPixel(x, y int) Color {
 	var c Color
-	RunInThread(func() {
-		c = (Color)(C.al_get_pixel((*C.ALLEGRO_BITMAP)(b), C.int(x), C.int(y)))
-	})
+
+	c = (Color)(C.al_get_pixel((*C.ALLEGRO_BITMAP)(b), C.int(x), C.int(y)))
+
 	return c
 }
 
 func (b *Bitmap) IsCompatible() bool {
 	var v bool
-	RunInThread(func() {
-		v = bool(C.al_is_compatible_bitmap((*C.ALLEGRO_BITMAP)(b)))
-	})
+
+	v = bool(C.al_is_compatible_bitmap((*C.ALLEGRO_BITMAP)(b)))
+
 	return v
 }
 
 func (b *Bitmap) IsSubBitmap() bool {
 	var v bool
-	RunInThread(func() {
-		v = bool(C.al_is_sub_bitmap((*C.ALLEGRO_BITMAP)(b)))
-	})
+
+	v = bool(C.al_is_sub_bitmap((*C.ALLEGRO_BITMAP)(b)))
+
 	return v
 }
 
 func (b *Bitmap) GetParentBitmap() *Bitmap {
 	var bmp *Bitmap
-	RunInThread(func() {
-		bmp = (*Bitmap)(C.al_get_parent_bitmap((*C.ALLEGRO_BITMAP)(b)))
-	})
+
+	bmp = (*Bitmap)(C.al_get_parent_bitmap((*C.ALLEGRO_BITMAP)(b)))
+
 	return bmp
 }
 
 func (b *Bitmap) Draw(dx, dy float32, flags int) {
-	RunInThread(func() {
-		C.al_draw_bitmap((*C.ALLEGRO_BITMAP)(b), C.float(dx), C.float(dy), C.int(flags))
-	})
+
+	C.al_draw_bitmap((*C.ALLEGRO_BITMAP)(b), C.float(dx), C.float(dy), C.int(flags))
+
 }
 
 func (b *Bitmap) DrawTinted(dx, dy float32, flags int, color Color) {
-	RunInThread(func() {
-		C.al_draw_tinted_bitmap((*C.ALLEGRO_BITMAP)(b),
-			(C.ALLEGRO_COLOR)(color), C.float(dx), C.float(dy), C.int(flags))
-	})
+
+	C.al_draw_tinted_bitmap((*C.ALLEGRO_BITMAP)(b),
+		(C.ALLEGRO_COLOR)(color), C.float(dx), C.float(dy), C.int(flags))
+
 }
 
 func (b *Bitmap) DrawRegion(sx, sy, sw, sh, dx, dy float32, flags int) {
-	RunInThread(func() {
-		C.al_draw_bitmap_region((*C.ALLEGRO_BITMAP)(b), C.float(sx), C.float(sy),
-			C.float(sw), C.float(sh), C.float(dx), C.float(dy), C.int(flags))
-	})
+
+	C.al_draw_bitmap_region((*C.ALLEGRO_BITMAP)(b), C.float(sx), C.float(sy),
+		C.float(sw), C.float(sh), C.float(dx), C.float(dy), C.int(flags))
+
 }
 
 func (b *Bitmap) DrawTintedRegion(sx, sy, sw, sh, dx, dy float32, flags int, color Color) {
-	RunInThread(func() {
-		C.al_draw_tinted_bitmap_region((*C.ALLEGRO_BITMAP)(b), (C.ALLEGRO_COLOR)(color),
-			C.float(sx), C.float(sy),
-			C.float(sw), C.float(sh), C.float(dx), C.float(dy), C.int(flags))
-	})
+
+	C.al_draw_tinted_bitmap_region((*C.ALLEGRO_BITMAP)(b), (C.ALLEGRO_COLOR)(color),
+		C.float(sx), C.float(sy),
+		C.float(sw), C.float(sh), C.float(dx), C.float(dy), C.int(flags))
+
 }
 
 func (b *Bitmap) DrawRotated(cx, cy, dx, dy, angle float32, flags int) {
-	RunInThread(func() {
-		C.al_draw_rotated_bitmap((*C.ALLEGRO_BITMAP)(b),
-			C.float(cx), C.float(cy), C.float(dx), C.float(dy),
-			C.float(angle), C.int(flags))
-	})
+
+	C.al_draw_rotated_bitmap((*C.ALLEGRO_BITMAP)(b),
+		C.float(cx), C.float(cy), C.float(dx), C.float(dy),
+		C.float(angle), C.int(flags))
+
 }
 
 func (b *Bitmap) DrawTintedRotated(cx, cy, dx, dy, angle float32, flags int, color Color) {
-	RunInThread(func() {
-		C.al_draw_tinted_rotated_bitmap((*C.ALLEGRO_BITMAP)(b), (C.ALLEGRO_COLOR)(color),
-			C.float(cx), C.float(cy),
-			C.float(dx), C.float(dy), C.float(angle), C.int(flags))
-	})
+
+	C.al_draw_tinted_rotated_bitmap((*C.ALLEGRO_BITMAP)(b), (C.ALLEGRO_COLOR)(color),
+		C.float(cx), C.float(cy),
+		C.float(dx), C.float(dy), C.float(angle), C.int(flags))
+
 }
 
 func (b *Bitmap) DrawScaledRotated(cx, cy, dx, dy, xscale, yscale, angle float32, flags int) {
-	RunInThread(func() {
-		C.al_draw_scaled_rotated_bitmap((*C.ALLEGRO_BITMAP)(b),
-			C.float(cx), C.float(cy), C.float(dx), C.float(dy),
-			C.float(xscale), C.float(yscale), C.float(angle), C.int(flags))
-	})
+
+	C.al_draw_scaled_rotated_bitmap((*C.ALLEGRO_BITMAP)(b),
+		C.float(cx), C.float(cy), C.float(dx), C.float(dy),
+		C.float(xscale), C.float(yscale), C.float(angle), C.int(flags))
+
 }
 
 func (b *Bitmap) DrawTintedScaledRotated(cx, cy, dx, dy, xscale, yscale, angle float32,
 	flags int, color Color) {
-	RunInThread(func() {
-		C.al_draw_tinted_scaled_rotated_bitmap((*C.ALLEGRO_BITMAP)(b),
-			(C.ALLEGRO_COLOR)(color), C.float(cx), C.float(cy),
-			C.float(dx), C.float(dy), C.float(xscale), C.float(yscale), C.float(angle),
-			C.int(flags))
-	})
+
+	C.al_draw_tinted_scaled_rotated_bitmap((*C.ALLEGRO_BITMAP)(b),
+		(C.ALLEGRO_COLOR)(color), C.float(cx), C.float(cy),
+		C.float(dx), C.float(dy), C.float(xscale), C.float(yscale), C.float(angle),
+		C.int(flags))
+
 }
 
 func (b *Bitmap) DrawTintedScaledRotatedRegion(sx, sy, sw, sh, cx, cy, dx, dy, xscale, yscale,
 	angle float32, flags int, color Color) {
-	RunInThread(func() {
-		C.al_draw_tinted_scaled_rotated_bitmap_region((*C.ALLEGRO_BITMAP)(b),
-			C.float(sx), C.float(sy),
-			C.float(sw), C.float(sh), (C.ALLEGRO_COLOR)(color), C.float(cx), C.float(cy),
-			C.float(dx), C.float(dy), C.float(xscale), C.float(yscale), C.float(angle),
-			C.int(flags))
-	})
+
+	C.al_draw_tinted_scaled_rotated_bitmap_region((*C.ALLEGRO_BITMAP)(b),
+		C.float(sx), C.float(sy),
+		C.float(sw), C.float(sh), (C.ALLEGRO_COLOR)(color), C.float(cx), C.float(cy),
+		C.float(dx), C.float(dy), C.float(xscale), C.float(yscale), C.float(angle),
+		C.int(flags))
+
 }
 func (b *Bitmap) DrawScaled(sx, sy, sw, sh, cx, cy, cw, ch float32, flags int) {
-	RunInThread(func() {
-		C.al_draw_scaled_bitmap((*C.ALLEGRO_BITMAP)(b),
-			C.float(sx), C.float(sy), C.float(sw), C.float(sh),
-			C.float(cx), C.float(cy), C.float(cw), C.float(ch), C.int(flags))
-	})
+
+	C.al_draw_scaled_bitmap((*C.ALLEGRO_BITMAP)(b),
+		C.float(sx), C.float(sy), C.float(sw), C.float(sh),
+		C.float(cx), C.float(cy), C.float(cw), C.float(ch), C.int(flags))
+
 }
 
 func (b *Bitmap) DrawTintedScaled(sx, sy, sw, sh, cx, cy, cw, ch float32, flags int, color Color) {
-	RunInThread(func() {
-		C.al_draw_tinted_scaled_bitmap((*C.ALLEGRO_BITMAP)(b), (C.ALLEGRO_COLOR)(color),
-			C.float(sx), C.float(sy), C.float(sw), C.float(sh),
-			C.float(cx), C.float(cy), C.float(cw), C.float(ch), C.int(flags))
-	})
+
+	C.al_draw_tinted_scaled_bitmap((*C.ALLEGRO_BITMAP)(b), (C.ALLEGRO_COLOR)(color),
+		C.float(sx), C.float(sy), C.float(sw), C.float(sh),
+		C.float(cx), C.float(cy), C.float(cw), C.float(ch), C.int(flags))
+
 }
 
 func (b *Bitmap) SetTargetBitmap() {
-	RunInThread(func() {
-		C.al_set_target_bitmap((*C.ALLEGRO_BITMAP)(b))
-	})
+
+	C.al_set_target_bitmap((*C.ALLEGRO_BITMAP)(b))
+
 }
 
 func (d *Display) SetTargetBackbuffer() {
-	RunInThread(func() {
-		C.al_set_target_backbuffer((*C.ALLEGRO_DISPLAY)(d))
-	})
+
+	C.al_set_target_backbuffer((*C.ALLEGRO_DISPLAY)(d))
+
 }
 
 func GetCurrentDisplay() *Display {
 	var d *Display
-	RunInThread(func() {
-		d = (*Display)(C.al_get_current_display())
-	})
+
+	d = (*Display)(C.al_get_current_display())
+
 	return d
 }
 
 func GetBlender() (int, int, int) {
 	var a, b, c C.int
-	RunInThread(func() {
-		C.al_get_blender(&a, &b, &c)
-	})
+
+	C.al_get_blender(&a, &b, &c)
+
 	return int(a), int(b), int(c)
 }
 
 func SetBlender(op, src, dst int) {
-	RunInThread(func() {
-		C.al_set_blender(C.int(op), C.int(src), C.int(dst))
-	})
+
+	C.al_set_blender(C.int(op), C.int(src), C.int(dst))
+
 }
 
 func GetClippingRectangle() (int, int, int, int) {
 	var x, y, w, h C.int
-	RunInThread(func() {
-		C.al_get_clipping_rectangle(&x, &y, &w, &h)
-	})
+
+	C.al_get_clipping_rectangle(&x, &y, &w, &h)
+
 	return int(x), int(y), int(w), int(h)
 }
 
 func SetClippingRectangle(x, y, w, h int) {
-	RunInThread(func() {
-		C.al_set_clipping_rectangle(C.int(x), C.int(y), C.int(w), C.int(h))
-	})
+
+	C.al_set_clipping_rectangle(C.int(x), C.int(y), C.int(w), C.int(h))
+
 }
 
 func ResetClippingRectangle() {
-	RunInThread(func() {
-		C.al_reset_clipping_rectangle()
-	})
+
+	C.al_reset_clipping_rectangle()
+
 }
 
 func (b *Bitmap) ConvertMaskToAlpha(color Color) {
-	RunInThread(func() {
-		C.al_convert_mask_to_alpha((*C.ALLEGRO_BITMAP)(b), (C.ALLEGRO_COLOR)(color))
-	})
+
+	C.al_convert_mask_to_alpha((*C.ALLEGRO_BITMAP)(b), (C.ALLEGRO_COLOR)(color))
+
 }
 
 func HoldBitmapDrawing(hold bool) {
-	RunInThread(func() {
-		C.al_hold_bitmap_drawing(C.bool(hold))
-	})
+
+	C.al_hold_bitmap_drawing(C.bool(hold))
+
 }
 
 func IsBitmapDrawingHeld() bool {
 	var b bool
-	RunInThread(func() {
-		b = bool(C.al_is_bitmap_drawing_held())
-	})
+
+	b = bool(C.al_is_bitmap_drawing_held())
+
 	return b
 }
 
@@ -452,9 +427,9 @@ func LoadBitmap(fname string) *Bitmap {
 	defer C.free(unsafe.Pointer(cfname))
 
 	var b *Bitmap
-	RunInThread(func() {
-		b = (*Bitmap)(C.al_load_bitmap(cfname))
-	})
+
+	b = (*Bitmap)(C.al_load_bitmap(cfname))
+
 	return b
 }
 
@@ -462,9 +437,8 @@ func (b *Bitmap) Save(fname string) {
 	cfname := C.CString(fname)
 	defer C.free(unsafe.Pointer(cfname))
 
-	RunInThread(func() {
-		C.al_save_bitmap(cfname, (*C.ALLEGRO_BITMAP)(b))
-	})
+	C.al_save_bitmap(cfname, (*C.ALLEGRO_BITMAP)(b))
+
 }
 
 /*

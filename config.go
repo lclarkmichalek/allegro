@@ -11,9 +11,9 @@ type Config C.ALLEGRO_CONFIG
 
 func CreateConfig() *Config {
 	var c *Config
-	RunInThread(func() {
-		c = (*Config)(C.al_create_config())
-	})
+
+	c = (*Config)(C.al_create_config())
+
 	return c
 }
 
@@ -22,25 +22,24 @@ func LoadConfig(filename string) *Config {
 	defer C.free(unsafe.Pointer(cs))
 
 	var c *Config
-	RunInThread(func() {
-		c = (*Config)(C.al_load_config_file(cs))
-	})
+
+	c = (*Config)(C.al_load_config_file(cs))
+
 	return c
 }
 
 func (c *Config) Destroy() {
-	RunInThread(func() {
-		C.al_destroy_config((*C.ALLEGRO_CONFIG)(c))
-	})
+
+	C.al_destroy_config((*C.ALLEGRO_CONFIG)(c))
+
 }
 
 func (c *Config) AddSection(section string) {
 	cs := C.CString(section)
 	defer C.free(unsafe.Pointer(cs))
 
-	RunInThread(func() {
-		C.al_add_config_section((*C.ALLEGRO_CONFIG)(c), cs)
-	})
+	C.al_add_config_section((*C.ALLEGRO_CONFIG)(c), cs)
+
 }
 
 func (c *Config) AddComment(section string, comment string) {
@@ -49,9 +48,8 @@ func (c *Config) AddComment(section string, comment string) {
 	cs := C.CString(comment)
 	defer C.free(unsafe.Pointer(cs))
 
-	RunInThread(func() {
-		C.al_add_config_comment((*C.ALLEGRO_CONFIG)(c), ss, cs)
-	})
+	C.al_add_config_comment((*C.ALLEGRO_CONFIG)(c), ss, cs)
+
 }
 
 func (c *Config) Get(section string, key string) (string, bool) {
@@ -61,9 +59,9 @@ func (c *Config) Get(section string, key string) (string, bool) {
 	defer C.free(unsafe.Pointer(ks))
 
 	var cstr *C.char
-	RunInThread(func() {
-		cstr = C.al_get_config_value((*C.ALLEGRO_CONFIG)(c), ss, ks)
-	})
+
+	cstr = C.al_get_config_value((*C.ALLEGRO_CONFIG)(c), ss, ks)
+
 	if cstr == nil {
 		return "", false
 	}
@@ -78,9 +76,8 @@ func (c *Config) Set(section string, key string, val string) {
 	vs := C.CString(val)
 	defer C.free(unsafe.Pointer(vs))
 
-	RunInThread(func() {
-		C.al_set_config_value((*C.ALLEGRO_CONFIG)(c), ss, ks, vs)
-	})
+	C.al_set_config_value((*C.ALLEGRO_CONFIG)(c), ss, ks, vs)
+
 }
 
 func (c *Config) IterSections() chan string {
@@ -90,15 +87,14 @@ func (c *Config) IterSections() chan string {
 
 		var name_ptr *C.char
 
-		RunInThread(func() {
-			name_ptr = C.al_get_first_config_section((*C.ALLEGRO_CONFIG)(c), &iter)
-		})
+		name_ptr = C.al_get_first_config_section((*C.ALLEGRO_CONFIG)(c), &iter)
+
 		for name_ptr != nil {
 			name := C.GoString(name_ptr)
 			channel <- name
-			RunInThread(func() {
-				name_ptr = C.al_get_next_config_section(&iter)
-			})
+
+			name_ptr = C.al_get_next_config_section(&iter)
+
 		}
 		close(channel)
 	}()
@@ -113,15 +109,15 @@ func (c *Config) IterKeys(sec string) chan string {
 		defer C.free(unsafe.Pointer(ss))
 
 		var key_ptr *C.char
-		RunInThread(func() {
-			key_ptr = C.al_get_first_config_entry((*C.ALLEGRO_CONFIG)(c), ss, &iter)
-		})
+
+		key_ptr = C.al_get_first_config_entry((*C.ALLEGRO_CONFIG)(c), ss, &iter)
+
 		for key_ptr != nil {
 			key := C.GoString(key_ptr)
 			channel <- key
-			RunInThread(func() {
-				key_ptr = C.al_get_next_config_entry(&iter)
-			})
+
+			key_ptr = C.al_get_next_config_entry(&iter)
+
 		}
 		close(channel)
 	}()
@@ -132,7 +128,6 @@ func (m *Config) Merge(child *Config) {
 	m_ptr := (*C.ALLEGRO_CONFIG)(m)
 	c_ptr := (*C.ALLEGRO_CONFIG)(child)
 
-	RunInThread(func() {
-		C.al_merge_config_into(m_ptr, c_ptr)
-	})
+	C.al_merge_config_into(m_ptr, c_ptr)
+
 }

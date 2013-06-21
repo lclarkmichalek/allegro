@@ -33,9 +33,9 @@ func GetEvents(sources []*EventSource) chan interface{} {
 	sourcesStopped := make(chan bool)
 	for _, evSrc := range sources {
 		go func() {
-			<- evSrc.stopped
+			<-evSrc.stopped
 			sourcesStopped <- true
-		} ()
+		}()
 	}
 
 	go func() {
@@ -56,12 +56,12 @@ func GetEvents(sources []*EventSource) chan interface{} {
 			go func() {
 				C.al_wait_for_event(queue, &al_event)
 				gotEv.Unlock()
-			} ()
+			}()
 			go func() {
-				<- sourcesStopped
+				<-sourcesStopped
 				stopped = true
 				gotEv.Unlock()
-			} ()
+			}()
 			gotEv.Lock()
 
 			ev := toEv(al_event)

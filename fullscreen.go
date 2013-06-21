@@ -15,15 +15,15 @@ type DisplayMode struct {
 
 func DisplayModes() []DisplayMode {
 	var n int
-	RunInThread(func() {
-		n = int(C.al_get_num_display_modes())
-	})
+
+	n = int(C.al_get_num_display_modes())
+
 	modes := make([]DisplayMode, n)
 	for i := 0; i < n; i++ {
 		var mode C.ALLEGRO_DISPLAY_MODE
-		RunInThread(func() {
-			C.al_get_display_mode(C.int(i), &mode)
-		})
+
+		C.al_get_display_mode(C.int(i), &mode)
+
 		modes[i] = DisplayMode{
 			int(mode.width), int(mode.height),
 			int(mode.format), int(mode.refresh_rate)}

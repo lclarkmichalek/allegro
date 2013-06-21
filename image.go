@@ -8,13 +8,13 @@ package allegro
 import "C"
 
 func InitImage() {
-	RunInThread(func() {
-		C.al_init_image_addon()
-	})
+
+	C.al_init_image_addon()
+
 }
 
 func ShutdownImage() {
-	RunInThread(func() {
-		C.al_shutdown_image_addon()
-	})
+
+	C.al_shutdown_image_addon()
+
 }
