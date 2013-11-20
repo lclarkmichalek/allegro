@@ -1,10 +1,21 @@
 package main
 
 import (
-	"allegro"
+	"github.com/bluepeppers/allegro"
 	"runtime"
 	"fmt"
 )
+
+var alFuncs chan func() = make(chan func())
+
+func init() {
+	go func() {
+		runtime.LockOSThread()
+		for f := range alFuncs {
+			f()
+		}
+	}()
+}
 
 func main() {
 	fmt.Println("Starting")
@@ -13,14 +24,21 @@ func main() {
 	allegro.InstallKeyboard()
 	allegro.InstallMouse()
 
-	disp := allegro.CreateDisplay(600, 400, allegro.WINDOWED)
-
 	runtime.GOMAXPROCS(10)
 
-	color = allegro.CreateColor(100, 0, 0, 255)
-	color.Clear()
-	allegro.Flip()
+	doneChan := make(chan bool)
+	var disp *allegro.Display
+	alFuncs <- func() {
+		disp = allegro.CreateDisplay(600, 400, allegro.WINDOWED)
 
+
+		color = allegro.CreateColor(100, 0, 0, 255)
+		color.Clear()
+		allegro.Flip()
+		doneChan <- true
+	}
+
+	<- doneChan
 	fmt.Println("Created window")
 
 	handleEvents(disp)
@@ -39,7 +57,7 @@ func handleEvents(disp *allegro.Display) {
 		case allegro.DisplayResizeEvent:
 			disp.AcknowledgeResize()
 		case allegro.MouseButtonDown:
-			DisplayColor()
+			alFuncs <- DisplayColor
 		case allegro.DisplayCloseEvent:
 			return
 		case allegro.KeyDownEvent:
