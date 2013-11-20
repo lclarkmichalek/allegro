@@ -28,7 +28,7 @@ func UninstallKeyboard() {
 
 }
 
-func GetKeyboadState() *KeyboardState {
+func GetKeyboardState() *KeyboardState {
 	var state C.ALLEGRO_KEYBOARD_STATE
 
 	C.al_get_keyboard_state(&state)
